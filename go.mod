@@ -1,4 +1,4 @@
-module github.com/NitinN77/spends-tracker
+module github.com/NitinN77/credit-card-spends-tracker
 
 go 1.23.1
 

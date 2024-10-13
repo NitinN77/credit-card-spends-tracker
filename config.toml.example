@@ -1,5 +1,5 @@
 user_email = "YOUR EMAIL HERE"
-fetch_days_count = 2                                           # fetch transactions from last 5 days
+fetch_days_count = 5                                         # fetch transactions from last 5 days
 source_emails = ['alerts@hdfcbank.net', 'alerts@axisbank.com']
 axis_card_details = [
     { last4 = "1234", name = "Axis Ace" },    # last4 is the last 4 digits of your credit card

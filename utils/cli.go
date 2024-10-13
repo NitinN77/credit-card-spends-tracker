@@ -3,7 +3,7 @@ package utils
 import (
 	"os"
 
-	"github.com/NitinN77/spends-tracker/global"
+	"github.com/NitinN77/credit-card-spends-tracker/global"
 	"github.com/pelletier/go-toml/v2"
 )
 

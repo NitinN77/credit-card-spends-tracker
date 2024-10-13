@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/NitinN77/spends-tracker/global"
+	"github.com/NitinN77/credit-card-spends-tracker/global"
 )
 
 type HDFCCardTxn struct {

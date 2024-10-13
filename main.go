@@ -6,9 +6,9 @@ import (
 
 	"time"
 
-	"github.com/NitinN77/spends-tracker/extractors"
-	"github.com/NitinN77/spends-tracker/gmail"
-	"github.com/NitinN77/spends-tracker/utils"
+	"github.com/NitinN77/credit-card-spends-tracker/extractors"
+	"github.com/NitinN77/credit-card-spends-tracker/gmail"
+	"github.com/NitinN77/credit-card-spends-tracker/utils"
 )
 
 func main() {
