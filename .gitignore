@@ -1,0 +1,6 @@
+.git
+token.json
+credentials.json
+.venv
+dummy.txt
+config.toml
