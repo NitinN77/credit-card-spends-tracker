@@ -9,7 +9,6 @@ import (
 
 type AppConfig struct {
 	UserEmail       string               `toml:"user_email"`
-	FetchDaysCount  int                  `toml:"fetch_days_count"`
 	SourceEmails    []string             `toml:"source_emails"`
 	AxisCardDetails []global.CardDetails `toml:"axis_card_details"`
 	HDFCCardDetails []global.CardDetails `toml:"hdfc_card_details"`

@@ -3,63 +3,41 @@ package main
 import (
 	"fmt"
 	"log"
-
+	"os"
 	"time"
 
-	"github.com/NitinN77/credit-card-spends-tracker/extractors"
-	"github.com/NitinN77/credit-card-spends-tracker/gmail"
 	"github.com/NitinN77/credit-card-spends-tracker/utils"
+	"github.com/jmoiron/sqlx"
+	_ "modernc.org/sqlite"
 )
 
 func main() {
 
-	srv := gmail.GetGmailService()
-	appConfig := utils.GetAppConfig()
+	args := os.Args[1:]
+	command := args[0]
 
-	today := time.Now()
-	dateNDaysAgo := utils.GetDateNDaysAgo(today, appConfig.FetchDaysCount)
-	sourceEmailsStr := utils.GenerateFromEmailsQuery(appConfig.SourceEmails)
-
-	emailList, err := srv.Users.Messages.List(appConfig.UserEmail).Q(fmt.Sprintf("after:%s {%s}", dateNDaysAgo, sourceEmailsStr)).Do()
+	db, err := sqlx.Connect("sqlite", "file:spends-tracker.db")
 	if err != nil {
-		log.Fatalf("Unable to retrieve email list: %v", err)
+		log.Fatalln(err)
 	}
+	utils.InitDB(db)
 
-	cardTotals := make(map[string]float64)
+	if command == "--fetch" {
+		startDate := args[1]
+		endDate := args[2]
 
-	for _, email := range emailList.Messages {
-		emailData, err := srv.Users.Messages.Get(appConfig.UserEmail, email.Id).Do()
+		parsedStartDate, err := time.Parse("2006-01-02", startDate)
 		if err != nil {
-			log.Fatalf("Unable to retrieve email: %v", err)
+			fmt.Println("Error parsing date:", err)
+			return
 		}
 
-		snippet := emailData.Snippet
-
-		isHDFCCard, hdfcTxn := extractors.ExtractHDFCCard(snippet, appConfig.HDFCCardDetails)
-
-		if isHDFCCard {
-			if cardTotal, exists := cardTotals[hdfcTxn.CardName]; exists {
-				cardTotals[hdfcTxn.CardName] = cardTotal + hdfcTxn.Amount
-			} else {
-				cardTotals[hdfcTxn.CardName] = hdfcTxn.Amount
-			}
-			continue
+		parsedEndDate, err := time.Parse("2006-01-02", endDate)
+		if err != nil {
+			fmt.Println("Error parsing date:", err)
+			return
 		}
 
-		isAxisCard, axisTxn := extractors.ExtractAxisCard(snippet, appConfig.AxisCardDetails)
-
-		if isAxisCard {
-			if cardTotal, exists := cardTotals[axisTxn.CardName]; exists {
-				cardTotals[axisTxn.CardName] = cardTotal + axisTxn.Amount
-			} else {
-				cardTotals[axisTxn.CardName] = axisTxn.Amount
-			}
-			continue
-		}
-
-	}
-
-	for cardName, totalSpent := range cardTotals {
-		fmt.Printf("Spends with %s: %.2f\n", cardName, totalSpent)
+		fetchTransactions(parsedStartDate, parsedEndDate, db)
 	}
 }

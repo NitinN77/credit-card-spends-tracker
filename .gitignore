@@ -4,3 +4,4 @@ credentials.json
 .venv
 dummy.txt
 config.toml
+spends-tracker.db
