@@ -14,7 +14,7 @@ It does this by making use of the [Gmail API](https://developers.google.com/gmai
 
 ## Quickstart
 
-1. Clone the repo and create a file named `config.toml` in the root directory. Copy the contents of `config.toml.example` into it and edit `user_email` with your email and edit `axis_card_details` and `hdfc_card_details` to match your cards
+1. Clone the repo and create a file named `config.toml` in the root directory. Copy the contents of `config.toml.example` into it and edit `user_email` to your email and edit `axis_card_details` and `hdfc_card_details` to match your cards
 2. Run `go build .` to build the application
 3. Follow [these](https://developers.google.com/gmail/api/quickstart/go#set_up_your_environment) steps till you get your hands on your `credentials.json` file (Follow till Step 7 of "Authorize credentials for a desktop application"). Ensure this file is in the root directory. [Troubleshooting](#troubleshooting)
 4. Run `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14` (fetches transactions between Oct 10th and Oct 14th)
