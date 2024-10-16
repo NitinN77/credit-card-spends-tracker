@@ -15,7 +15,7 @@ It does this by making use of the [Gmail API](https://developers.google.com/gmai
 ## Quickstart
 
 1. Clone the repo and run `go build .` to build the application
-2. Follow [these](https://developers.google.com/gmail/api/quickstart/go#set_up_your_environment) steps till you get your hands on your `credentials.json` file. Ensure this file is in the root directory.
+2. Follow [these](https://developers.google.com/gmail/api/quickstart/go#set_up_your_environment) steps till you get your hands on your `credentials.json` file (Follow till Step 7 of "Authorize credentials for a desktop application"). Ensure this file is in the root directory.
 3. Run `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14` (fetches transactions between Oct 10th and Oct 14th)
 4. During first time set up, you will have to log in to your respective google account as prompted by the application.
 
