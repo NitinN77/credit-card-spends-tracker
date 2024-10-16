@@ -37,5 +37,6 @@ Example: `.\credit-card-spends-tracker.exe --alias "WWW SWIGGY COM" "Swiggy"`
 > An alias is a merchant tag used by a merchant in a transaction email. A merchant can have multiple aliases that they use which requires us to store known aliases for proper categorization.
 
 ## Roadmap
-1. Add unit tests
-2. Improve stdout formatting  
+1. Add error handling for improper CLI arguments
+2. Add unit tests
+3. Improve stdout formatting  
