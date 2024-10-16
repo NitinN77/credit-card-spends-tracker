@@ -9,3 +9,20 @@ func checkIfCreditCardEmail(snippet string) bool {
 		return false
 	}
 }
+
+func extractStringBetween(str, start, end string) string {
+	startIndex := strings.Index(str, start)
+	if startIndex == -1 {
+		return ""
+	}
+
+	startIndex += len(start)
+
+	endIndex := strings.Index(str[startIndex:], end)
+	if endIndex == -1 {
+		return ""
+	}
+
+	result := str[startIndex : startIndex+endIndex]
+	return strings.TrimSpace(result)
+}

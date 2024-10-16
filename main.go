@@ -39,5 +39,11 @@ func main() {
 		}
 
 		fetchTransactions(parsedStartDate, parsedEndDate, db)
+	} else if command == "--alias" {
+		alias := args[1]
+		merchant := args[2]
+
+		utils.StoreAlias(db, alias, merchant)
+		fmt.Printf("Stored alias %s for merchant %s\n", alias, merchant)
 	}
 }

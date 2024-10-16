@@ -10,7 +10,9 @@ import (
 
 type AxisCardTxn struct {
 	CardName string
+	Last4    string
 	Amount   float64
+	Merchant string
 }
 
 func ExtractAxisCard(snippet string, axisCardDetails []global.CardDetails) (bool, AxisCardTxn) {
@@ -34,7 +36,8 @@ func ExtractAxisCard(snippet string, axisCardDetails []global.CardDetails) (bool
 
 		for _, axisCard := range axisCardDetails {
 			if strings.Contains(updatedSnippet, "XX"+axisCard.Last4) {
-				return true, AxisCardTxn{axisCard.Name, amount}
+				merchant := extractStringBetween(updatedSnippet, "at", "on")
+				return true, AxisCardTxn{axisCard.Name, axisCard.Last4, amount, merchant}
 			}
 		}
 		return false, AxisCardTxn{}

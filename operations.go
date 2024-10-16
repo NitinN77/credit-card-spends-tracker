@@ -54,14 +54,14 @@ func fetchTransactions(startDate, endDate time.Time, db *sqlx.DB) {
 		isHDFCCard, hdfcTxn := extractors.ExtractHDFCCard(snippet, appConfig.HDFCCardDetails)
 
 		if isHDFCCard {
-			utils.SaveTransactionToDB(db, hdfcTxn.CardName, hdfcTxn.Amount, emailData.InternalDate)
+			utils.SaveTransactionToDB(db, hdfcTxn.CardName, hdfcTxn.Last4, hdfcTxn.Amount, hdfcTxn.Merchant, emailData.InternalDate)
 			continue
 		}
 
 		isAxisCard, axisTxn := extractors.ExtractAxisCard(snippet, appConfig.AxisCardDetails)
 
 		if isAxisCard {
-			utils.SaveTransactionToDB(db, axisTxn.CardName, axisTxn.Amount, emailData.InternalDate)
+			utils.SaveTransactionToDB(db, axisTxn.CardName, axisTxn.Last4, axisTxn.Amount, axisTxn.Merchant, emailData.InternalDate)
 			continue
 		}
 	}
@@ -73,6 +73,8 @@ func fetchTransactions(startDate, endDate time.Time, db *sqlx.DB) {
 	fetchedTransactions := utils.GetTransactions(db, startDate, endDate)
 
 	cardTotals := make(map[string]float64)
+	merchantAliasMap := utils.GetMerchantAliases(db)
+	merchantTotals := make(map[string]float64)
 
 	for _, txn := range fetchedTransactions {
 		if cardTotal, exists := cardTotals[txn.CardName]; exists {
@@ -80,9 +82,26 @@ func fetchTransactions(startDate, endDate time.Time, db *sqlx.DB) {
 		} else {
 			cardTotals[txn.CardName] = txn.Amount
 		}
+
+		merchantName, exists := merchantAliasMap[txn.Merchant]
+		if !exists {
+			merchantName = txn.Merchant
+		}
+
+		if merchantTotal, exists := merchantTotals[merchantName]; exists {
+			merchantTotals[merchantName] = merchantTotal + txn.Amount
+		} else {
+			merchantTotals[merchantName] = txn.Amount
+		}
 	}
+	fmt.Printf("\nSpends by credit card\n\n")
 
 	for cardName, totalSpent := range cardTotals {
-		fmt.Printf("Spends with %s: %.2f\n", cardName, totalSpent)
+		fmt.Printf("Amount spent with %s: %.2f\n", cardName, totalSpent)
+	}
+	fmt.Printf("\nSpends by merchant\n\n")
+
+	for merchantName, merchantTotal := range merchantTotals {
+		fmt.Printf("Amount spent on %s: %.2f\n", merchantName, merchantTotal)
 	}
 }

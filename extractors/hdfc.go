@@ -10,7 +10,9 @@ import (
 
 type HDFCCardTxn struct {
 	CardName string
+	Last4    string
 	Amount   float64
+	Merchant string
 }
 
 func ExtractHDFCCard(snippet string, hdfcCardDetails []global.CardDetails) (bool, HDFCCardTxn) {
@@ -31,7 +33,8 @@ func ExtractHDFCCard(snippet string, hdfcCardDetails []global.CardDetails) (bool
 
 		for _, hdfcCard := range hdfcCardDetails {
 			if strings.Contains(snippet, "HDFC Bank Credit Card ending "+hdfcCard.Last4) {
-				return true, HDFCCardTxn{hdfcCard.Name, amount}
+				merchant := extractStringBetween(snippet, "at", "on")
+				return true, HDFCCardTxn{hdfcCard.Name, hdfcCard.Last4, amount, merchant}
 			}
 		}
 		return false, HDFCCardTxn{}

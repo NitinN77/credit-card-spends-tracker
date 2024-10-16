@@ -2,6 +2,7 @@ package utils
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -12,39 +13,60 @@ type TransactionDB struct {
 	ID       int     `db:"id"`
 	Amount   float64 `db:"amount"`
 	CardName string  `db:"card_name"`
+	Last4    string  `db:"last_4"`
+	Merchant string  `db:"merchant"`
 	Date     string  `db:"date"`
 }
 
+type AliasDB struct {
+	ID       int    `db:"id"`
+	Alias    string `db:"alias"`
+	Merchant string `db:"merchant"`
+}
+
 func InitDB(db *sqlx.DB) {
-	schema := `
-		CREATE TABLE IF NOT EXISTS cc_transactions (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			amount REAL,
-			card_name TEXT,
-			date TEXT
-		);
-		CREATE TABLE IF NOT EXISTS fetched_date_ranges (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			start_date TEXT,
-			end_date TEXT
-		);
-	`
-	_, err := db.Exec(schema)
+	schema, err := os.ReadFile("sql/init_tables.sql")
+	if err != nil {
+		log.Fatalf("Error reading SQL file: %v", err)
+	}
+
+	_, err = db.Exec(string(schema))
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	var count int
+	query := `SELECT COUNT(1) FROM merchant_aliases LIMIT 1;`
+
+	err = db.Get(&count, query)
+	if err != nil {
+		log.Fatalf("Error fetching merchant table count from DB: %v", err)
+	}
+
+	if count == 0 {
+		schema, err := os.ReadFile("sql/init_aliases.sql")
+		if err != nil {
+			log.Fatalf("Error reading SQL file: %v", err)
+		}
+
+		_, err = db.Exec(string(schema))
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
 }
 
-func SaveTransactionToDB(db *sqlx.DB, cardName string, amount float64, timestamp int64) {
+func SaveTransactionToDB(db *sqlx.DB, cardName string, last4 string, amount float64, merchant string, timestamp int64) {
 	query := `
-		INSERT INTO cc_transactions (card_name, amount, date)
-		VALUES (?, ?, ?);
+		INSERT INTO cc_transactions (card_name, last_4, amount, merchant, date)
+		VALUES (?, ?, ?, ?, ?);
 	`
 
 	t := time.Unix(timestamp/1000, 0)
 	formattedDate := t.Format("2006-01-02")
 
-	_, err := db.Exec(query, cardName, amount, formattedDate)
+	_, err := db.Exec(query, cardName, last4, amount, merchant, formattedDate)
 	if err != nil {
 		log.Fatalln("Error inserting transaction into DB:", err)
 	}
@@ -69,7 +91,7 @@ func GetTransactions(db *sqlx.DB, startDate, endDate time.Time) []TransactionDB 
 	var transactions []TransactionDB
 
 	query := `
-		SELECT id, amount, card_name, date
+		SELECT id, amount, card_name, last_4, merchant, date
 		FROM cc_transactions
 		WHERE date >= ? AND date <= ?
 	`
@@ -80,4 +102,35 @@ func GetTransactions(db *sqlx.DB, startDate, endDate time.Time) []TransactionDB 
 	}
 
 	return transactions
+}
+
+func GetMerchantAliases(db *sqlx.DB) map[string]string {
+	aliasMap := make(map[string]string)
+	var aliasesDB []AliasDB
+
+	query := `
+		SELECT id, alias, merchant
+		FROM merchant_aliases;
+	`
+	err := db.Select(&aliasesDB, query)
+	if err != nil {
+		log.Fatalln("Error retrieving merchant aliases from DB: ", err)
+	}
+
+	for _, aliasDB := range aliasesDB {
+		aliasMap[aliasDB.Alias] = aliasDB.Merchant
+	}
+
+	return aliasMap
+}
+
+func StoreAlias(db *sqlx.DB, alias, merchant string) {
+	query := `
+		INSERT INTO merchant_aliases (alias, merchant)
+		VALUES (?, ?);
+	`
+	_, err := db.Exec(query, alias, merchant)
+	if err != nil {
+		log.Fatalln("Error inserting merchant alias:", err)
+	}
 }
