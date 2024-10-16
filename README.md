@@ -11,6 +11,7 @@ It does this by making use of the [Gmail API](https://developers.google.com/gmai
 
 - Fetch and view your credit card transactions between any date range (currently supports Axis and HDFC cards).
 - Displays spend totals by credit card and merchant.
+- Fetch transactions filtered by a merchant, optionally within a specified date range
 - Caches fetched transactions in a local SQLite database to prevent duplicate fetch calls in the future.
 - Allows you to manually add aliases for merchant names for better organization of your transactions.
 
