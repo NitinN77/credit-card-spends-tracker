@@ -30,6 +30,7 @@ Example: `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14`
 2. Add an alias for a merchant
 
 `credit-card-spends-tracker.exe --alias {alias} {merchant_name}`
+
 Example: `.\credit-card-spends-tracker.exe --alias "WWW SWIGGY COM" "Swiggy"`
 
 > [!NOTE]  
