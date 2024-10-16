@@ -34,7 +34,7 @@ Example: `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14`
 Example: `.\credit-card-spends-tracker.exe --alias "WWW SWIGGY COM" "Swiggy"`
 
 > [!NOTE]  
-> An alias is a merchant tag used by a merchant in a transaction email. A merchant can have multiple aliases that they use which requires us to store known aliases for proper categorization.
+> An alias is a merchant tag used by a merchant in a transaction email. A merchant can have multiple aliases which requires us to store known aliases for proper categorization.
 
 ## Roadmap
 1. Add error handling for improper CLI arguments
