@@ -1,12 +1,14 @@
 # Credit Card Spends Tracker (WIP)
+
 A CLI tool to fetch and store your credit card transaction details from your inbox. <b>(India only)</b>
 
-The motivation behind this is to avoid the usage of proprietary apps like CRED or Axio that offer similar functionality but might sell your data. This application is open source and can be built from source if you feel the need to do so. 
+The motivation behind this is to avoid the usage of proprietary apps like CRED or Axio that offer similar functionality but might sell your data. This application is open source and can be built from source if you feel the need to do so.
 An alternative would be an open source mobile application that reads your SMS data which seems to have convuluted permission issues. I made this for myself to quickly check my spends across all my cards.
 
 It does this by making use of the [Gmail API](https://developers.google.com/gmail/api/guides/) to fetch your emails using your <b>own</b> GCP credentials ensuring that you're the <b>only</b> one with access to your emails.
 
 ## Features
+
 - Fetch and view your credit card transactions between any date range (currently supports Axis and HDFC cards)
 - Displays spend totals by credit card and merchant
 - Caches fetched transactions in a local SQLite database to prevent duplicate fetch calls in the future
@@ -22,7 +24,7 @@ It does this by making use of the [Gmail API](https://developers.google.com/gmai
 ## Commands
 
 1. Fetch transactions between two dates (inclusive)
-   
+
 `credit-card-spends-tracker.exe --fetch {YYYY-MM-DD} {YYYY-MM-DD}`
 
 Example: `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14`
@@ -33,13 +35,27 @@ Example: `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14`
 
 Example: `.\credit-card-spends-tracker.exe --alias "WWW SWIGGY COM" "Swiggy"`
 
+3. Fetch transactions filtered by a merchant
+
+`credit-card-spends-tracker.exe --filter {merchant}`
+
+Example: `.\credit-card-spends-tracker.exe --filter Swiggy`
+
+4. Fetch transactions filtered by a merchant within a date range (inclusive)
+
+`credit-card-spends-tracker.exe --filter {merchant} {YYYY-MM-DD} {YYYY-MM-DD}`
+
+Example: `.\credit-card-spends-tracker.exe --filter Swiggy 2024-10-10 2024-10-12`
+
 > [!NOTE]  
 > An alias is a merchant tag used by a merchant in a transaction email. A merchant can have multiple aliases which requires us to store known aliases for proper categorization.
 
 ## Roadmap
+
 1. Add error handling for improper CLI arguments
 2. Add unit tests
 3. Improve stdout formatting
 
 ## Troubleshooting
-- If you get an "Unable to connect" error page after following the steps to authenticate, copy the string in between `code=` and `&scope` in the current page URL and paste it into the your console 
+
+- If you get an "Unable to connect" error page after following the steps to authenticate, copy the string in between `code=` and `&scope` in the current page URL and paste it into the your console

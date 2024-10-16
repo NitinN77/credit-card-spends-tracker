@@ -134,3 +134,85 @@ func StoreAlias(db *sqlx.DB, alias, merchant string) {
 		log.Fatalln("Error inserting merchant alias:", err)
 	}
 }
+
+func GetTransactionsByMerchant(db *sqlx.DB, merchant string) []TransactionDB {
+	var aliasesDB []AliasDB
+
+	query := `
+		SELECT id, alias, merchant
+		FROM merchant_aliases
+		WHERE merchant = ?;
+	`
+	err := db.Select(&aliasesDB, query, merchant)
+	if err != nil {
+		log.Fatalln("Error retrieving aliases: ", err)
+	}
+
+	var aliasList []string
+
+	for _, aliasDB := range aliasesDB {
+		aliasList = append(aliasList, aliasDB.Alias)
+	}
+
+	var transactions []TransactionDB
+
+	inQuery := `
+		SELECT id, amount, card_name, last_4, merchant, date
+		FROM cc_transactions
+		WHERE merchant IN (?)
+		ORDER BY date DESC;
+	`
+	query, args, err := sqlx.In(inQuery, aliasList)
+	if err != nil {
+		log.Fatalln("Error constructing IN query: ", err)
+	}
+
+	query = db.Rebind(query)
+	err = db.Select(&transactions, query, args...)
+	if err != nil {
+		log.Fatalln("Error retrieving transactions: ", err)
+	}
+
+	return transactions
+}
+
+func GetTransactionsByMerchantWithinDateRange(db *sqlx.DB, merchant string, startDate, endDate time.Time) []TransactionDB {
+	var aliasesDB []AliasDB
+
+	query := `
+		SELECT id, alias, merchant
+		FROM merchant_aliases
+		WHERE merchant = ?;
+	`
+	err := db.Select(&aliasesDB, query, merchant)
+	if err != nil {
+		log.Fatalln("Error retrieving aliases: ", err)
+	}
+
+	var aliasList []string
+
+	for _, aliasDB := range aliasesDB {
+		aliasList = append(aliasList, aliasDB.Alias)
+	}
+
+	var transactions []TransactionDB
+
+	inQuery := `
+		SELECT id, amount, card_name, last_4, merchant, date
+		FROM cc_transactions
+		WHERE merchant IN (?) AND date >= ? AND date <= ?
+		ORDER BY date DESC;
+	`
+	query, args, err := sqlx.In(inQuery, aliasList, startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
+	if err != nil {
+		log.Fatalln("Error constructing IN query: ", err)
+	}
+
+	query = db.Rebind(query)
+	err = db.Select(&transactions, query, args...)
+	if err != nil {
+		log.Fatalln("Error retrieving transactions: ", err)
+	}
+
+	return transactions
+}

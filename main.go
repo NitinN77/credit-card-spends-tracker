@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
+	"text/tabwriter"
 
 	"github.com/NitinN77/credit-card-spends-tracker/utils"
 	"github.com/jmoiron/sqlx"
@@ -26,17 +26,8 @@ func main() {
 		startDate := args[1]
 		endDate := args[2]
 
-		parsedStartDate, err := time.Parse("2006-01-02", startDate)
-		if err != nil {
-			fmt.Println("Error parsing date:", err)
-			return
-		}
-
-		parsedEndDate, err := time.Parse("2006-01-02", endDate)
-		if err != nil {
-			fmt.Println("Error parsing date:", err)
-			return
-		}
+		parsedStartDate := utils.DateStringToTime(startDate)
+		parsedEndDate := utils.DateStringToTime(endDate)
 
 		fetchTransactions(parsedStartDate, parsedEndDate, db)
 	} else if command == "--alias" {
@@ -45,5 +36,27 @@ func main() {
 
 		utils.StoreAlias(db, alias, merchant)
 		fmt.Printf("Stored alias %s for merchant %s\n", alias, merchant)
+	} else if command == "--filter" {
+		merchant := args[1]
+		var transactions []utils.TransactionDB
+
+		if len(args) == 4 {
+			startDate := args[2]
+			endDate := args[3]
+
+			parsedStartDate := utils.DateStringToTime(startDate)
+			parsedEndDate := utils.DateStringToTime(endDate)
+
+			transactions = utils.GetTransactionsByMerchantWithinDateRange(db, merchant, parsedStartDate, parsedEndDate)
+		} else {
+			transactions = utils.GetTransactionsByMerchant(db, merchant)
+		}
+
+		w := tabwriter.NewWriter(os.Stdout, 1, 5, 3, ' ', 0)
+		for _, txn := range transactions {
+			fmt.Fprintf(w, "%s\t%s\t%s\tRs.%.2f\t%s\n", txn.Date, txn.CardName, txn.Last4, txn.Amount, txn.Merchant)
+		}
+		w.Flush()
+
 	}
 }
