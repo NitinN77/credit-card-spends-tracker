@@ -15,9 +15,9 @@ It does this by making use of the [Gmail API](https://developers.google.com/gmai
 ## Quickstart
 
 1. Clone the repo and run `go build .` to build the application
-2. Follow [these](https://developers.google.com/gmail/api/quickstart/go#set_up_your_environment) steps till you get your hands on your `credentials.json` file (Follow till Step 7 of "Authorize credentials for a desktop application"). Ensure this file is in the root directory.
+2. Follow [these](https://developers.google.com/gmail/api/quickstart/go#set_up_your_environment) steps till you get your hands on your `credentials.json` file (Follow till Step 7 of "Authorize credentials for a desktop application"). Ensure this file is in the root directory. [Troubleshooting](#troubleshooting)
 3. Run `.\credit-card-spends-tracker.exe --fetch 2024-10-10 2024-10-14` (fetches transactions between Oct 10th and Oct 14th)
-4. During first time set up, you will have to log in to your respective google account as prompted by the application.
+4. During first time set up, you will have to log in to your respective google account as prompted by the application. This involves providing Gmail API access to the GCP project you created. The application will either automatically authenticate itself or you will have to manually copy the code and paste it into your console.
 
 ## Commands
 
@@ -39,4 +39,7 @@ Example: `.\credit-card-spends-tracker.exe --alias "WWW SWIGGY COM" "Swiggy"`
 ## Roadmap
 1. Add error handling for improper CLI arguments
 2. Add unit tests
-3. Improve stdout formatting  
+3. Improve stdout formatting
+
+## Troubleshooting
+- If you get an "Unable to connect" error page after following the steps to authenticate, copy the string in between `code=` and `&scope` in the current page URL and paste it into the your console 
